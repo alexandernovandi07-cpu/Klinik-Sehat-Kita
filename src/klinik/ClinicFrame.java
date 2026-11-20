@@ -1,6 +1,8 @@
 package klinik;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
@@ -211,6 +213,13 @@ public class ClinicFrame extends JFrame {
         southContainer.add(buttonPanel, BorderLayout.NORTH);
         southContainer.add(scrollLog, BorderLayout.CENTER);
         add(southContainer, BorderLayout.SOUTH);
+
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleRegisterPatient();
+            }
+        });
     }
 
     private void setupFocusAndLiveValidation() {
@@ -285,5 +294,61 @@ public class ClinicFrame extends JFrame {
             public void removeUpdate(DocumentEvent e) { validateBpjs.run(); }
             public void changedUpdate(DocumentEvent e) { validateBpjs.run(); }
         });
+    }
+
+    private void handleRegisterPatient() {
+        try {
+            String newPatientId = manager.registerPatient(
+                    txtName.getText(),
+                    txtAge.getText(),
+                    (String) cmbPoli.getSelectedItem(),
+                    txtComplaint.getText(),
+                    chkBpjs.isSelected(),
+                    txtBpjsNo.getText()
+            );
+
+            txtName.setText("");
+            txtAge.setText("");
+            txtComplaint.setText("");
+            txtBpjsNo.setText("");
+            chkBpjs.setSelected(false);
+            txtBpjsNo.setEnabled(false);
+
+            txtName.setBorder(normalBorder);
+            txtAge.setBorder(normalBorder);
+            txtBpjsNo.setBorder(normalBorder);
+
+            lblNameWarn.setText(" ");
+            lblAgeWarn.setText(" ");
+            lblBpjsWarn.setText(" ");
+
+            refreshDisplay();
+
+            JOptionPane.showMessageDialog(this,
+                    "Pasien berhasil masuk ke dalam antrean!\nID Pasien: " + newPatientId,
+                    "Pendaftaran Berhasil", JOptionPane.INFORMATION_MESSAGE, successIcon);
+
+        } catch (InvalidPatientDataException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Validasi Input Gagal", JOptionPane.WARNING_MESSAGE, warningIcon);
+        } finally {
+            System.out.println("Proses percobaan registrasi pasien selesai.");
+        }
+    }
+
+    private void refreshDisplay() {
+        StringBuilder qText = new StringBuilder();
+        int pos = 1;
+        for (Patient p : manager.getWaitingQueue()) {
+            qText.append(pos++).append(". ").append(p.toString()).append("\n");
+        }
+        areaQueue.setText(qText.length() == 0 ? "(Tidak ada pasien dalam antrean)" : qText.toString());
+
+        StringBuilder hText = new StringBuilder();
+        for (Patient p : manager.getPatientHistory()) {
+            hText.append("• ").append(p.toString()).append("\n");
+        }
+        areaHistory.setText(hText.length() == 0 ? "(Belum ada riwayat pasien)" : hText.toString());
+        areaLog.setText(manager.getActivityLog());
     }
 }
