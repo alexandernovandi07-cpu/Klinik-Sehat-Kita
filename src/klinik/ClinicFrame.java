@@ -592,10 +592,9 @@ public class ClinicFrame extends JFrame {
             }
         };
 
-        Thread daemonThread = new Thread(
-                backgroundTask, "Clinic-AutoSave-Thread");
+        Thread autoSaveThread = new Thread(
+             backgroundTask, "Clinic-AutoSave-Thread");
 
-        daemonThread.setDaemon(true);
-        daemonThread.start();
+     autoSaveThread.start();
     }
 }
