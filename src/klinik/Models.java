@@ -174,3 +174,62 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
         );
     }
 }
+
+// WEEK 4 & WEEK 6: Inheritance and Polymorphism
+class RegulerPatient extends Patient {
+    private static final long serialVersionUID = 1L;
+
+    public RegulerPatient(String id, String name, int age,
+                          String complaint, double baseFee) {
+        super(id, name, age, complaint, baseFee);
+    }
+
+    @Override
+    public String getPatientCategory() {
+        return "Pasien Reguler (Umum)";
+    }
+
+    @Override
+    public double calculateTotalBill() {
+        return getBaseConsultationFee() + ADMIN_FEE;
+    }
+}
+
+// WEEK 4 & WEEK 6: Hierarchical Inheritance
+class BPJSPatient extends Patient {
+    private static final long serialVersionUID = 1L;
+
+    private String bpjsNumber;
+
+    public BPJSPatient(String id, String name, int age,
+                       String complaint, double baseFee,
+                       String bpjsNumber) {
+        super(id, name, age, complaint, baseFee);
+        setBpjsNumber(bpjsNumber);
+    }
+
+    public String getBpjsNumber() {
+        return bpjsNumber;
+    }
+
+    public void setBpjsNumber(String bpjsNumber) {
+        if (bpjsNumber == null ||
+            !bpjsNumber.matches("\\d{13}")) {
+            throw new IllegalArgumentException(
+                "Nomor BPJS harus terdiri dari 13 digit angka"
+            );
+        }
+
+        this.bpjsNumber = bpjsNumber;
+    }
+
+    @Override
+    public String getPatientCategory() {
+        return "Pasien BPJS (No: " + bpjsNumber + ")";
+    }
+
+    @Override
+    public double calculateTotalBill() {
+        return getBaseConsultationFee() * 0.20;
+    }
+}
