@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
 public class ClinicFrame extends JFrame {
     private final ClinicManager manager = new ClinicManager();
@@ -201,6 +204,25 @@ public class ClinicFrame extends JFrame {
 
         JScrollPane scrollHistory = new JScrollPane(areaHistory);
         scrollHistory.setBorder(new TitledBorder("Riwayat Seluruh Pasien (ArrayList)"));
+
+        // Klik satu kali pada baris pasien untuk melihat detail
+        areaHistory.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int offset = areaHistory.viewToModel2D(e.getPoint());
+
+                try {
+                    int line = areaHistory.getLineOfOffset(offset);
+                    List<Patient> patients = manager.getPatientHistory();
+
+                    if (line >= 0 && line < patients.size()) {
+                        showPatientDetail(patients.get(line));
+                    }
+                } catch (BadLocationException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         centerPanel.add(scrollQueue);
         centerPanel.add(scrollHistory);
@@ -447,6 +469,38 @@ public class ClinicFrame extends JFrame {
             JOptionPane.showMessageDialog(this, sb.toString(),
                     "Hasil Pencarian", JOptionPane.INFORMATION_MESSAGE, successIcon);
         }
+    }
+
+    // Menampilkan detail pasien
+    private void showPatientDetail(Patient patient) {
+        String jenisPasien;
+        String nomorBpjs = "-";
+
+        if (patient instanceof BPJSPatient) {
+            BPJSPatient bpjsPatient = (BPJSPatient) patient;
+            jenisPasien = "BPJS";
+
+            String number = bpjsPatient.getBpjsNumber();
+            nomorBpjs = "*********" + number.substring(9);
+        } else {
+            jenisPasien = "Reguler";
+        }
+
+        String detail =
+                "ID Pasien       : " + patient.getId() + "\n" +
+                "Nama            : " + patient.getName() + "\n" +
+                "Umur            : " + patient.getAge() + " tahun\n" +
+                "Jenis Pasien    : " + jenisPasien + "\n" +
+                "Nomor BPJS      : " + nomorBpjs + "\n" +
+                "Keluhan         : " + patient.getComplaint() + "\n" +
+                "Total Tagihan   : " +
+                patient.getCurrencyFormat(patient.calculateTotalBill());
+
+        JOptionPane.showMessageDialog(this,
+                detail,
+                "Detail Pasien",
+                JOptionPane.INFORMATION_MESSAGE,
+                successIcon);
     }
 
     private void loadInitialData() {
