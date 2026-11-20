@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -220,6 +222,32 @@ public class ClinicFrame extends JFrame {
                 handleRegisterPatient();
             }
         });
+    }
+    
+    private void handleCallNextPatient() {
+        Patient called = manager.callNextPatient();
+
+        if (called == null) {
+            JOptionPane.showMessageDialog(this, "Antrean saat ini kosong!",
+                    "Info Antrean", JOptionPane.WARNING_MESSAGE, warningIcon);
+            return;
+        }
+
+        String fileName = "Struk_" + called.getId() + ".txt";
+
+        try {
+            manager.exportReceiptToTxt(called, fileName);
+            refreshDisplay();
+
+            JOptionPane.showMessageDialog(this,
+                    called.generateReceipt() + "\nStruk telah diekspor ke file: " + fileName,
+                    "Pasien Dipanggil & Struk Dicetak",
+                    JOptionPane.INFORMATION_MESSAGE, successIcon);
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Gagal mencetak struk: " + ex.getMessage(),
+                    "File I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
+        }
     }
 
     private void setupFocusAndLiveValidation() {
