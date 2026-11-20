@@ -7,7 +7,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -18,6 +18,7 @@ import javax.swing.event.DocumentListener;
 public class ClinicFrame extends JFrame {
     private final ClinicManager manager = new ClinicManager();
 
+    // GUI Components (Week 13)
     private final JTextField txtName = new JTextField();
     private final JTextField txtAge = new JTextField();
     private final JComboBox<String> cmbPoli = new JComboBox<>(new String[]{
@@ -28,10 +29,12 @@ public class ClinicFrame extends JFrame {
     private final JTextField txtBpjsNo = new JTextField();
     private final JTextField txtSearch = new JTextField(10);
 
+    // Label peringatan merah di bawah tiap kolom
     private final JLabel lblNameWarn = new JLabel(" ");
     private final JLabel lblAgeWarn = new JLabel(" ");
     private final JLabel lblBpjsWarn = new JLabel(" ");
 
+    // Border normal vs border merah terang (kompatibel dengan macOS)
     private final Border normalBorder = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(180, 185, 190), 1),
             BorderFactory.createEmptyBorder(3, 6, 3, 6)
@@ -42,6 +45,7 @@ public class ClinicFrame extends JFrame {
             BorderFactory.createEmptyBorder(2, 5, 2, 5)
     );
 
+    // WEEK 13: Custom ImageIcon untuk pop-up Berhasil (Centang Hijau) & Gagal (Tanda Seru)
     private final ImageIcon successIcon = createSuccessIcon();
     private final ImageIcon warningIcon = createWarningIcon();
 
@@ -57,19 +61,25 @@ public class ClinicFrame extends JFrame {
         setSize(1140, 760);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        // WEEK 13: BorderLayout as main container layout
         setLayout(new BorderLayout(10, 10));
 
         initComponents();
         setupFocusAndLiveValidation();
+        loadInitialData();
     }
 
+    // Membuat ImageIcon Centang Hijau untuk notifikasi berhasil
     private ImageIcon createSuccessIcon() {
         int size = 44;
         BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         g2.setColor(new Color(22, 163, 74));
         g2.fillOval(2, 2, size - 4, size - 4);
+
         g2.setColor(Color.WHITE);
         g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2.drawLine(12, 23, 19, 30);
@@ -78,13 +88,16 @@ public class ClinicFrame extends JFrame {
         return new ImageIcon(img);
     }
 
+    // Membuat ImageIcon Tanda Seru untuk notifikasi gagal / peringatan
     private ImageIcon createWarningIcon() {
         int size = 44;
         BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         g2.setColor(new Color(220, 38, 38));
         g2.fillOval(2, 2, size - 4, size - 4);
+
         g2.setColor(Color.WHITE);
         g2.setStroke(new BasicStroke(4.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2.drawLine(22, 12, 22, 25);
@@ -96,6 +109,7 @@ public class ClinicFrame extends JFrame {
     private void initComponents() {
         Color clinicGreen = new Color(16, 124, 65);
 
+        // 1. NORTH PANEL: Header & Live Thread Status
         JPanel headerPanel = new JPanel(new BorderLayout(20, 0));
         headerPanel.setBackground(clinicGreen);
         headerPanel.setBorder(new EmptyBorder(12, 16, 12, 16));
@@ -111,6 +125,7 @@ public class ClinicFrame extends JFrame {
         headerPanel.add(lblClockAndThread, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
+        // 2. WEST PANEL: Patient Registration Form using GridLayout
         JPanel formPanel = new JPanel(new GridLayout(0, 1, 2, 2));
         formPanel.setBorder(new TitledBorder("Form Pendaftaran Pasien Baru"));
         formPanel.setPreferredSize(new Dimension(340, 0));
@@ -157,6 +172,7 @@ public class ClinicFrame extends JFrame {
 
         add(formPanel, BorderLayout.WEST);
 
+        // Toggle BPJS field
         chkBpjs.addActionListener(e -> {
             boolean selected = chkBpjs.isSelected();
             txtBpjsNo.setEnabled(selected);
@@ -169,6 +185,7 @@ public class ClinicFrame extends JFrame {
             }
         });
 
+        // 3. CENTER PANEL: Split view for Live Queue (FIFO) and Master Patient History
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 10));
 
         areaQueue.setEditable(false);
@@ -189,20 +206,36 @@ public class ClinicFrame extends JFrame {
         centerPanel.add(scrollHistory);
         add(centerPanel, BorderLayout.CENTER);
 
+        // 4. SOUTH PANEL: Action Buttons (FlowLayout) + Thread-Safe Activity Log
         JPanel southContainer = new JPanel(new BorderLayout(5, 5));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
         JButton btnCallNext = new JButton("2. Panggil Pasien & Cetak Struk (.txt)");
         JButton btnStats = new JButton("3. Statistik & Urutkan Tagihan");
         JButton btnSave = new JButton("4. Simpan DB (.ser)");
-        JButton btnReset = new JButton("Reset Data");
         JLabel lblSearch = new JLabel("Cari ID/Nama:");
         JButton btnSearch = new JButton("Cari");
 
         buttonPanel.add(btnCallNext);
         buttonPanel.add(btnStats);
         buttonPanel.add(btnSave);
+
+        JButton btnReset = new JButton("Reset Data");
         buttonPanel.add(btnReset);
+
+        btnReset.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Hapus seluruh riwayat dan antrean pasien?", "Konfirmasi Reset",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, warningIcon);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                manager.resetDatabase();
+                refreshDisplay();
+                JOptionPane.showMessageDialog(this, "Data berhasil direset menjadi 0!",
+                        "Reset Berhasil", JOptionPane.INFORMATION_MESSAGE, successIcon);
+            }
+        });
+
         buttonPanel.add(lblSearch);
         buttonPanel.add(txtSearch);
         buttonPanel.add(btnSearch);
@@ -216,40 +249,35 @@ public class ClinicFrame extends JFrame {
         southContainer.add(scrollLog, BorderLayout.CENTER);
         add(southContainer, BorderLayout.SOUTH);
 
+        // WEEK 13: Event Handling with ActionListener
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 handleRegisterPatient();
             }
         });
-    }
-    
-    private void handleCallNextPatient() {
-        Patient called = manager.callNextPatient();
 
-        if (called == null) {
-            JOptionPane.showMessageDialog(this, "Antrean saat ini kosong!",
-                    "Info Antrean", JOptionPane.WARNING_MESSAGE, warningIcon);
-            return;
-        }
+        btnCallNext.addActionListener(e -> handleCallNextPatient());
+        btnStats.addActionListener(e -> JOptionPane.showMessageDialog(this,
+                manager.getClinicStatistics(), "Statistik Klinik (Collections.sort/max/min)",
+                JOptionPane.INFORMATION_MESSAGE, successIcon));
 
-        String fileName = "Struk_" + called.getId() + ".txt";
+        btnSave.addActionListener(e -> {
+            try {
+                manager.saveDatabaseToFile();
+                refreshDisplay();
+                JOptionPane.showMessageDialog(this, "Database berhasil disimpan ke clinic_data.ser!",
+                        "Penyimpanan Berhasil", JOptionPane.INFORMATION_MESSAGE, successIcon);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Gagal menyimpan file: " + ex.getMessage(),
+                        "I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
+            }
+        });
 
-        try {
-            manager.exportReceiptToTxt(called, fileName);
-            refreshDisplay();
-
-            JOptionPane.showMessageDialog(this,
-                    called.generateReceipt() + "\nStruk telah diekspor ke file: " + fileName,
-                    "Pasien Dipanggil & Struk Dicetak",
-                    JOptionPane.INFORMATION_MESSAGE, successIcon);
-
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Gagal mencetak struk: " + ex.getMessage(),
-                    "File I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
-        }
+        btnSearch.addActionListener(e -> handleSearch());
     }
 
+    // Validasi otomatis saat kursor keluar dari kolom (focusLost) & saat isi berubah
     private void setupFocusAndLiveValidation() {
         Runnable validateName = () -> {
             String val = txtName.getText();
@@ -364,19 +392,97 @@ public class ClinicFrame extends JFrame {
         }
     }
 
+    private void handleCallNextPatient() {
+        Patient called = manager.callNextPatient();
+
+        if (called == null) {
+            JOptionPane.showMessageDialog(this, "Antrean saat ini kosong!",
+                    "Info Antrean", JOptionPane.WARNING_MESSAGE, warningIcon);
+            return;
+        }
+
+        String fileName = "Struk_" + called.getId() + ".txt";
+
+        try {
+            manager.exportReceiptToTxt(called, fileName);
+            refreshDisplay();
+
+            JOptionPane.showMessageDialog(this,
+                    called.generateReceipt() + "\nStruk telah diekspor ke file: " + fileName,
+                    "Pasien Dipanggil & Struk Dicetak",
+                    JOptionPane.INFORMATION_MESSAGE, successIcon);
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Gagal mencetak struk: " + ex.getMessage(),
+                    "File I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
+        }
+    }
+
+    private void handleSearch() {
+        String query = txtSearch.getText().trim();
+
+        if (query.isEmpty()) return;
+
+        Patient byId = manager.searchPatient(
+                query.startsWith("PSN-") ? query : "PSN-" + query);
+
+        if (byId != null) {
+            JOptionPane.showMessageDialog(this, "Ditemukan via ID:\n" + byId.generateReceipt(),
+                    "Hasil Pencarian", JOptionPane.INFORMATION_MESSAGE, successIcon);
+            return;
+        }
+
+        List<Patient> byName = manager.searchPatient(query, 0);
+
+        if (byName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pasien '" + query + "' tidak ditemukan.",
+                    "Hasil Pencarian", JOptionPane.WARNING_MESSAGE, warningIcon);
+        } else {
+            StringBuilder sb = new StringBuilder("Ditemukan " + byName.size() + " pasien:\n\n");
+
+            for (Patient p : byName) {
+                sb.append(p.toString()).append("\n");
+            }
+
+            JOptionPane.showMessageDialog(this, sb.toString(),
+                    "Hasil Pencarian", JOptionPane.INFORMATION_MESSAGE, successIcon);
+        }
+    }
+
+    private void loadInitialData() {
+        try {
+            manager.loadDatabaseFromFile();
+        } catch (Exception ex) {
+            manager.logActivity("Memulai dengan database baru.");
+        }
+
+        refreshDisplay();
+    }
+
     private void refreshDisplay() {
         StringBuilder qText = new StringBuilder();
         int pos = 1;
+
         for (Patient p : manager.getWaitingQueue()) {
             qText.append(pos++).append(". ").append(p.toString()).append("\n");
         }
-        areaQueue.setText(qText.length() == 0 ? "(Tidak ada pasien dalam antrean)" : qText.toString());
+
+        areaQueue.setText(
+                qText.length() == 0
+                        ? "(Tidak ada pasien dalam antrean)"
+                        : qText.toString());
 
         StringBuilder hText = new StringBuilder();
+
         for (Patient p : manager.getPatientHistory()) {
             hText.append("• ").append(p.toString()).append("\n");
         }
-        areaHistory.setText(hText.length() == 0 ? "(Belum ada riwayat pasien)" : hText.toString());
+
+        areaHistory.setText(
+                hText.length() == 0
+                        ? "(Belum ada riwayat pasien)"
+                        : hText.toString());
+
         areaLog.setText(manager.getActivityLog());
     }
 }
