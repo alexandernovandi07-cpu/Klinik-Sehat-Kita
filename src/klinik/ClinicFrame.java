@@ -9,6 +9,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -71,6 +73,7 @@ public class ClinicFrame extends JFrame {
         initComponents();
         setupFocusAndLiveValidation();
         loadInitialData();
+        startBackgroundThread(); // WEEK 14: Launch Multithreading
     }
 
     // Membuat ImageIcon Centang Hijau untuk notifikasi berhasil
@@ -80,9 +83,11 @@ public class ClinicFrame extends JFrame {
         Graphics2D g2 = img.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // Lingkaran hijau
         g2.setColor(new Color(22, 163, 74));
         g2.fillOval(2, 2, size - 4, size - 4);
 
+        // Tanda centang putih
         g2.setColor(Color.WHITE);
         g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2.drawLine(12, 23, 19, 30);
@@ -98,9 +103,11 @@ public class ClinicFrame extends JFrame {
         Graphics2D g2 = img.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // Lingkaran merah peringatan
         g2.setColor(new Color(220, 38, 38));
         g2.fillOval(2, 2, size - 4, size - 4);
 
+        // Tanda seru putih (!)
         g2.setColor(Color.WHITE);
         g2.setStroke(new BasicStroke(4.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2.drawLine(22, 12, 22, 25);
@@ -301,6 +308,7 @@ public class ClinicFrame extends JFrame {
 
     // Validasi otomatis saat kursor keluar dari kolom (focusLost) & saat isi berubah
     private void setupFocusAndLiveValidation() {
+        // Validasi Nama Lengkap wajib huruf KAPITAL semua
         Runnable validateName = () -> {
             String val = txtName.getText();
             if (!val.isEmpty() && !val.equals(val.toUpperCase())) {
@@ -323,6 +331,7 @@ public class ClinicFrame extends JFrame {
             public void changedUpdate(DocumentEvent e) { validateName.run(); }
         });
 
+        // 2. Umur: wajib bentuk angka saja
         Runnable validateAge = () -> {
             String val = txtAge.getText().trim();
             if (!val.isEmpty() && !val.matches("\\d+")) {
@@ -345,6 +354,7 @@ public class ClinicFrame extends JFrame {
             public void changedUpdate(DocumentEvent e) { validateAge.run(); }
         });
 
+        // 3. Nomor BPJS: wajib 13 digit angka jika BPJS dicentang
         Runnable validateBpjs = () -> {
             if (!chkBpjs.isSelected()) {
                 txtBpjsNo.setBorder(normalBorder);
@@ -538,5 +548,54 @@ public class ClinicFrame extends JFrame {
                         : hText.toString());
 
         areaLog.setText(manager.getActivityLog());
+    }
+
+    // WEEK 14: Multithreading via Runnable, Thread.sleep(), and synchronized Auto-Save
+    private void startBackgroundThread() {
+        Runnable backgroundTask = new Runnable() {
+            private int secondsCounter = 0;
+            private final SimpleDateFormat sdf =
+                    new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+            @Override
+            public void run() {
+                while (runningThread) {
+                    try {
+                        Thread.sleep(1000);
+                        secondsCounter++;
+
+                        String timeStr = sdf.format(new Date());
+
+                        if (secondsCounter % 30 == 0
+                                && !manager.getPatientHistory().isEmpty()) {
+                            manager.saveDatabaseToFile();
+                            SwingUtilities.invokeLater(() -> refreshDisplay());
+                        }
+
+                        final int nextSave = 30 - (secondsCounter % 30);
+
+                        SwingUtilities.invokeLater(() ->
+                                lblClockAndThread.setText(
+                                        "Jam: " + timeStr
+                                                + " | Auto-Save Thread: Aktif ("
+                                                + nextSave + "d)"
+                                ));
+
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    } catch (IOException ioEx) {
+                        System.err.println(
+                                "Auto-save gagal: " + ioEx.getMessage());
+                    }
+                }
+            }
+        };
+
+        Thread daemonThread = new Thread(
+                backgroundTask, "Clinic-AutoSave-Thread");
+
+        daemonThread.setDaemon(true);
+        daemonThread.start();
     }
 }
