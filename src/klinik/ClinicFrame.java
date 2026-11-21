@@ -94,5 +94,65 @@ public class ClinicFrame extends JFrame {
         headerPanel.add(lblTitle, BorderLayout.WEST);
         headerPanel.add(lblClockAndThread, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
+
+        // 2. WEST PANEL: Form pendaftaran pasien pakai GridLayout (Bab 13)
+        JPanel formPanel = new JPanel(new GridLayout(0, 1, 2, 2));
+        formPanel.setBorder(new TitledBorder("Form Pendaftaran Pasien Baru"));
+        formPanel.setPreferredSize(new Dimension(340, 0));
+
+        txtName.setBorder(normalBorder);
+        txtAge.setBorder(normalBorder);
+        txtComplaint.setBorder(normalBorder);
+        txtBpjsNo.setBorder(normalBorder);
+
+        Font warnFont = new Font("SansSerif", Font.BOLD, 11);
+        lblNameWarn.setForeground(Color.RED);
+        lblNameWarn.setFont(warnFont);
+        lblAgeWarn.setForeground(Color.RED);
+        lblAgeWarn.setFont(warnFont);
+        lblBpjsWarn.setForeground(Color.RED);
+        lblBpjsWarn.setFont(warnFont);
+
+        formPanel.add(new JLabel("Nama Lengkap Pasien (HURUF KAPITAL):"));
+        formPanel.add(txtName);
+        formPanel.add(lblNameWarn);
+
+        formPanel.add(new JLabel("Umur (Tahun):"));
+        formPanel.add(txtAge);
+        formPanel.add(lblAgeWarn);
+
+        formPanel.add(new JLabel("Pilih Poliklinik Tujuan:"));
+        formPanel.add(cmbPoli);
+        formPanel.add(new JLabel("Keluhan Medis:"));
+        formPanel.add(txtComplaint);
+        formPanel.add(chkBpjs);
+        formPanel.add(new JLabel("Nomor Kartu BPJS (13 digit angka):"));
+
+        txtBpjsNo.setEnabled(false);
+        formPanel.add(txtBpjsNo);
+        formPanel.add(lblBpjsWarn);
+
+        JButton btnAdd = new JButton("1. Tambah ke Antrean");
+        btnAdd.setBackground(clinicGreen);
+        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setOpaque(true);
+        btnAdd.setBorderPainted(false);
+        btnAdd.setFont(new Font("SansSerif", Font.BOLD, 13));
+        formPanel.add(btnAdd);
+
+        add(formPanel, BorderLayout.WEST);
+
+        // Toggle aktif/nonaktif kolom BPJS saat checkbox dicentang
+        chkBpjs.addActionListener(e -> {
+            boolean selected = chkBpjs.isSelected();
+            txtBpjsNo.setEnabled(selected);
+            if (selected) {
+                txtBpjsNo.requestFocus();
+            } else {
+                txtBpjsNo.setText("");
+                txtBpjsNo.setBorder(normalBorder);
+                lblBpjsWarn.setText(" ");
+            }
+        });
     }
 }
