@@ -74,6 +74,7 @@ public class ClinicFrame extends JFrame {
         setLayout(new BorderLayout(10, 10));
 
         initComponents();
+        loadInitialData();
     }
 
     private void initComponents() {
@@ -154,5 +155,67 @@ public class ClinicFrame extends JFrame {
                 lblBpjsWarn.setText(" ");
             }
         });
+
+        // 3. CENTER PANEL: Split tampilan Antrean (Queue FIFO) & Riwayat (ArrayList)
+        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+
+        areaQueue.setEditable(false);
+        areaQueue.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        areaQueue.setBackground(new Color(244, 251, 247));
+        JScrollPane scrollQueue = new JScrollPane(areaQueue);
+        scrollQueue.setBorder(new TitledBorder("Antrean Tunggu Saat Ini (Queue - FIFO)"));
+
+        areaHistory.setEditable(false);
+        areaHistory.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        areaHistory.setBackground(new Color(244, 251, 247));
+        areaHistory.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JScrollPane scrollHistory = new JScrollPane(areaHistory);
+        scrollHistory.setBorder(new TitledBorder("Riwayat Seluruh Pasien (ArrayList)"));
+
+        centerPanel.add(scrollQueue);
+        centerPanel.add(scrollHistory);
+        add(centerPanel, BorderLayout.CENTER);
+    }
+
+    // Bab 12 (Java IO) & Bab 11 (Exceptions): Baca ulang data dari file serialisasi saat aplikasi dibuka
+    private void loadInitialData() {
+        try {
+            manager.loadDatabaseFromFile();
+        } catch (Exception ex) {
+            manager.logActivity("Memulai dengan database baru.");
+        }
+
+        refreshDisplay();
+    }
+
+    private void refreshDisplay() {
+        // Bab 9 (String): Pakai StringBuilder supaya penyusunan daftar antrean lebih efisien
+        StringBuilder qText = new StringBuilder();
+        int pos = 1;
+
+        // Bab 10 (Generics & Collections): Iterasi elemen dari Queue antrean
+        for (Patient p : manager.getWaitingQueue()) {
+            qText.append(pos++).append(". ").append(p.toString()).append("\n");
+        }
+
+        areaQueue.setText(
+                qText.length() == 0
+                        ? "(Tidak ada pasien dalam antrean)"
+                        : qText.toString());
+
+        StringBuilder hText = new StringBuilder();
+
+        // Bab 10 (Generics & Collections): Iterasi elemen dari ArrayList riwayat
+        for (Patient p : manager.getPatientHistory()) {
+            hText.append("• ").append(p.toString()).append("\n");
+        }
+
+        areaHistory.setText(
+                hText.length() == 0
+                        ? "(Belum ada riwayat pasien)"
+                        : hText.toString());
+
+        areaLog.setText(manager.getActivityLog());
     }
 }
