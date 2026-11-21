@@ -176,6 +176,37 @@ public class ClinicFrame extends JFrame {
         centerPanel.add(scrollQueue);
         centerPanel.add(scrollHistory);
         add(centerPanel, BorderLayout.CENTER);
+
+        // 4. SOUTH PANEL: Tombol aksi (FlowLayout) + Log aktivitas thread-safe
+        JPanel southContainer = new JPanel(new BorderLayout(5, 5));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
+        JButton btnCallNext = new JButton("2. Panggil Pasien & Cetak Struk (.txt)");
+        JButton btnStats = new JButton("3. Statistik & Urutkan Tagihan");
+        JButton btnSave = new JButton("4. Simpan DB (.ser)");
+        JLabel lblSearch = new JLabel("Cari ID/Nama:");
+        JButton btnSearch = new JButton("Cari");
+
+        buttonPanel.add(btnCallNext);
+        buttonPanel.add(btnStats);
+        buttonPanel.add(btnSave);
+
+        JButton btnReset = new JButton("Reset Data");
+        buttonPanel.add(btnReset);
+
+        buttonPanel.add(lblSearch);
+        buttonPanel.add(txtSearch);
+        buttonPanel.add(btnSearch);
+
+        areaLog.setEditable(false);
+        areaLog.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        JScrollPane scrollLog = new JScrollPane(areaLog);
+        // Bab 9 (String): Log di dalam manager memakai StringBuffer yang thread-safe
+        scrollLog.setBorder(new TitledBorder("Log Aktivitas Thread-Safe (StringBuffer)"));
+
+        southContainer.add(buttonPanel, BorderLayout.NORTH);
+        southContainer.add(scrollLog, BorderLayout.CENTER);
+        add(southContainer, BorderLayout.SOUTH);
     }
 
     // Bab 12 (Java IO) & Bab 11 (Exceptions): Baca ulang data dari file serialisasi saat aplikasi dibuka
