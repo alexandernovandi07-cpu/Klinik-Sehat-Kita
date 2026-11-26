@@ -55,6 +55,10 @@ public class ClinicFrame extends JFrame {
             BorderFactory.createEmptyBorder(2, 5, 2, 5)
     );
 
+    // Bab 13 (Java GUI): Custom ImageIcon untuk pop-up Berhasil (Centang Hijau) & Gagal (Tanda Seru)
+    private final ImageIcon successIcon = createSuccessIcon();
+    private final ImageIcon warningIcon = createWarningIcon();
+
     private final JTextArea areaQueue = new JTextArea();
     private final JTextArea areaHistory = new JTextArea();
     private final JTextArea areaLog = new JTextArea(5, 40);
@@ -75,6 +79,42 @@ public class ClinicFrame extends JFrame {
 
         initComponents();
         loadInitialData();
+    }
+
+    // Bab 13 (Java GUI): Gambar custom icon centang hijau pakai Graphics2D
+    private ImageIcon createSuccessIcon() {
+        int size = 44; // Bab 3 (Java Variables): Variabel lokal primitif int
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2.setColor(new Color(22, 163, 74));
+        g2.fillOval(2, 2, size - 4, size - 4);
+
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawLine(12, 23, 19, 30);
+        g2.drawLine(19, 30, 32, 15);
+        g2.dispose();
+        return new ImageIcon(img);
+    }
+
+    // Bab 13 (Java GUI): Gambar custom icon tanda seru merah pakai Graphics2D
+    private ImageIcon createWarningIcon() {
+        int size = 44;
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2.setColor(new Color(220, 38, 38));
+        g2.fillOval(2, 2, size - 4, size - 4);
+
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(4.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawLine(22, 12, 22, 25);
+        g2.fillOval(19, 30, 6, 6);
+        g2.dispose();
+        return new ImageIcon(img);
     }
 
     private void initComponents() {
