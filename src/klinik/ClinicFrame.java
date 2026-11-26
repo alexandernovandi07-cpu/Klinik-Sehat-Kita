@@ -214,6 +214,27 @@ public class ClinicFrame extends JFrame {
         JScrollPane scrollHistory = new JScrollPane(areaHistory);
         scrollHistory.setBorder(new TitledBorder("Riwayat Seluruh Pasien (ArrayList)"));
 
+        // Bab 4 (Inheritance) & Bab 6 (Polymorphism - Overriding): MouseAdapter mewarisi MouseListener
+        areaHistory.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int offset = areaHistory.viewToModel2D(e.getPoint());
+
+                // Bab 11 (Exceptions): Tangkap BadLocationException kalau klik di area kosong
+                try {
+                    int line = areaHistory.getLineOfOffset(offset);
+                    // Bab 10 (Generics & Collections): Ambil List<Patient> dari ArrayList riwayat
+                    List<Patient> patients = manager.getPatientHistory();
+
+                    if (line >= 0 && line < patients.size()) {
+                        showPatientDetail(patients.get(line));
+                    }
+                } catch (BadLocationException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
         centerPanel.add(scrollQueue);
         centerPanel.add(scrollHistory);
         add(centerPanel, BorderLayout.CENTER);
@@ -288,6 +309,8 @@ public class ClinicFrame extends JFrame {
                         "I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
             }
         });
+
+        btnSearch.addActionListener(e -> handleSearch());
     }
 
     // Validasi real-time saat mengetik maupun saat kursor pindah (focusLost)
@@ -437,6 +460,77 @@ public class ClinicFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Gagal mencetak struk: " + ex.getMessage(),
                     "File I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
         }
+    }
+
+    private void handleSearch() {
+        // Bab 9 (String): Rapikan input pencarian pakai trim() dan cek prefix startsWith()
+        String query = txtSearch.getText().trim();
+
+        if (query.isEmpty()) return;
+
+        // Bab 6 (Polymorphism - Method Overloading): searchPatient(String) untuk cari berdasarkan ID
+        Patient byId = manager.searchPatient(
+                query.startsWith("PSN-") ? query : "PSN-" + query);
+
+        if (byId != null) {
+            JOptionPane.showMessageDialog(this, "Ditemukan via ID:\n" + byId.generateReceipt(),
+                    "Hasil Pencarian", JOptionPane.INFORMATION_MESSAGE, successIcon);
+            return;
+        }
+
+        // Bab 6 (Polymorphism - Method Overloading): searchPatient(String, int) untuk cari berdasarkan Nama
+        List<Patient> byName = manager.searchPatient(query, 0);
+
+        if (byName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pasien '" + query + "' tidak ditemukan.",
+                    "Hasil Pencarian", JOptionPane.WARNING_MESSAGE, warningIcon);
+        } else {
+            // Bab 9 (String): Susun hasil pencarian pakai StringBuilder
+            StringBuilder sb = new StringBuilder("Ditemukan " + byName.size() + " pasien:\n\n");
+
+            for (Patient p : byName) {
+                sb.append(p.toString()).append("\n");
+            }
+
+            JOptionPane.showMessageDialog(this, sb.toString(),
+                    "Hasil Pencarian", JOptionPane.INFORMATION_MESSAGE, successIcon);
+        }
+    }
+
+    // Menampilkan detail pasien saat baris riwayat diklik
+    private void showPatientDetail(Patient patient) {
+        String jenisPasien;
+        String nomorBpjs = "-";
+
+        // Bab 4 (Inheritance) & Bab 6 (Polymorphism): Cek subclass BPJSPatient & downcasting
+        if (patient instanceof BPJSPatient) {
+            BPJSPatient bpjsPatient = (BPJSPatient) patient;
+            jenisPasien = "BPJS";
+
+            // Bab 5 (Encapsulation) & Bab 9 (String): Ambil no BPJS via getter lalu masking 9 digit awal
+            String number = bpjsPatient.getBpjsNumber();
+            nomorBpjs = "*********" + number.substring(9);
+        } else {
+            jenisPasien = "Reguler";
+        }
+
+        // Bab 5 (Encapsulation): Akses seluruh data atribut lewat method getter
+        // Bab 6 (Polymorphism - Dynamic Binding): calculateTotalBill() hitung tagihan sesuai jenis pasien
+        String detail =
+                "ID Pasien       : " + patient.getId() + "\n" +
+                "Nama            : " + patient.getName() + "\n" +
+                "Umur            : " + patient.getAge() + " tahun\n" +
+                "Jenis Pasien    : " + jenisPasien + "\n" +
+                "Nomor BPJS      : " + nomorBpjs + "\n" +
+                "Keluhan         : " + patient.getComplaint() + "\n" +
+                "Total Tagihan   : " +
+                patient.getCurrencyFormat(patient.calculateTotalBill());
+
+        JOptionPane.showMessageDialog(this,
+                detail,
+                "Detail Pasien",
+                JOptionPane.INFORMATION_MESSAGE,
+                successIcon);
     }
 
     // Bab 12 (Java IO) & Bab 11 (Exceptions): Baca ulang data dari file serialisasi saat aplikasi dibuka
