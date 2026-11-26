@@ -248,6 +248,14 @@ public class ClinicFrame extends JFrame {
         southContainer.add(buttonPanel, BorderLayout.NORTH);
         southContainer.add(scrollLog, BorderLayout.CENTER);
         add(southContainer, BorderLayout.SOUTH);
+
+        // Bab 7 (Abstraction) & Bab 13 (Event Handling): Implementasi interface ActionListener
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleRegisterPatient();
+            }
+        });
     }
 
     // Validasi real-time saat mengetik maupun saat kursor pindah (focusLost)
@@ -327,6 +335,47 @@ public class ClinicFrame extends JFrame {
             public void removeUpdate(DocumentEvent e) { validateBpjs.run(); }
             public void changedUpdate(DocumentEvent e) { validateBpjs.run(); }
         });
+    }
+
+    private void handleRegisterPatient() {
+        // Bab 11 (Exceptions): Blok try-catch-finally untuk menangani custom exception validasi
+        try {
+            String newPatientId = manager.registerPatient(
+                    txtName.getText(),
+                    txtAge.getText(),
+                    (String) cmbPoli.getSelectedItem(),
+                    txtComplaint.getText(),
+                    chkBpjs.isSelected(),
+                    txtBpjsNo.getText()
+            );
+
+            txtName.setText("");
+            txtAge.setText("");
+            txtComplaint.setText("");
+            txtBpjsNo.setText("");
+            chkBpjs.setSelected(false);
+            txtBpjsNo.setEnabled(false);
+
+            txtName.setBorder(normalBorder);
+            txtAge.setBorder(normalBorder);
+            txtBpjsNo.setBorder(normalBorder);
+
+            lblNameWarn.setText(" ");
+            lblAgeWarn.setText(" ");
+            lblBpjsWarn.setText(" ");
+
+            refreshDisplay();
+
+            JOptionPane.showMessageDialog(this,
+                    "Pasien berhasil masuk ke dalam antrean!\nID Pasien: " + newPatientId,
+                    "Pendaftaran Berhasil", JOptionPane.INFORMATION_MESSAGE, successIcon);
+
+        } catch (InvalidPatientDataException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Validasi Input Gagal", JOptionPane.WARNING_MESSAGE, warningIcon);
+        } finally {
+            System.out.println("Proses percobaan registrasi pasien selesai.");
+        }
     }
 
     // Bab 12 (Java IO) & Bab 11 (Exceptions): Baca ulang data dari file serialisasi saat aplikasi dibuka
