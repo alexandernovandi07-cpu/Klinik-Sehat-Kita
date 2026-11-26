@@ -7,7 +7,11 @@ public class MainApp {
     public static void main(String[] args) {
         // Run GUI on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
-            // Inisialisasi antarmuka utama
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception ignored) {}
+            ClinicFrame frame = new ClinicFrame();
+            frame.setVisible(true);
         });
     }
 }
