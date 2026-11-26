@@ -7,9 +7,9 @@ Dibuat untuk memenuhi **Final Project Mata Kuliah Pemrograman Berorientasi Objek
 ## Anggota Kelompok
 | Nama | NIM | Peran |
 | :--- | :--- | :--- |
-| Alexander Alvin Novandi | L0125002 | Lead Developer (Arsitektur OOP & GUI) |
-| *(Nama Anggota 2)* | *(NIM)* | Dokumentasi Makalah & Pengujian |
-| *(Nama Anggota 3)* | *(NIM)* | Desain Presentasi (PPT) & QA |
+| Alexander Alvin Novandi | L0125002 | Lead Developer & UI/GUI Developer |
+| Na'ila Tsabita Farha | L0125026 | Patient Management & Business Logic Developer |
+| Ayu Atikah Azhar | L0125127 | Application Architecture & Data Model Developer |
 
 ## Implementasi Materi Perkuliahan (Week 1–14)
 * **OOP Pillars (Week 1–7):** `abstract class Person`, `interface Billable`, Inheritance (`Patient` → `RegulerPatient` & `BPJSPatient`), Encapsulation (`private` fields + Getter/Setter), dan Polymorphism (`calculateTotalBill()` & overloaded `searchPatient()`).
