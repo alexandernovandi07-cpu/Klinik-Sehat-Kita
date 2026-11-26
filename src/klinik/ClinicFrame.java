@@ -80,6 +80,7 @@ public class ClinicFrame extends JFrame {
         initComponents();
         setupFocusAndLiveValidation();
         loadInitialData();
+        startBackgroundThread(); // Bab 14: Jalankan Multithreading
     }
 
     // Bab 13 (Java GUI): Gambar custom icon centang hijau pakai Graphics2D
@@ -572,5 +573,56 @@ public class ClinicFrame extends JFrame {
                         : hText.toString());
 
         areaLog.setText(manager.getActivityLog());
+    }
+
+    // Bab 14 (Multithreading): Background thread untuk jam real-time & auto-save tiap 30 detik
+    private void startBackgroundThread() {
+        // Bab 7 (Abstraction): Anonymous class mengimplementasikan interface Runnable
+        Runnable backgroundTask = new Runnable() {
+            private int secondsCounter = 0;
+            private final SimpleDateFormat sdf =
+                    new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+            @Override
+            public void run() {
+                while (runningThread) {
+                    try {
+                        Thread.sleep(1000); // Jeda thread 1 detik
+                        secondsCounter++;
+
+                        String timeStr = sdf.format(new Date());
+
+                        // Bab 12 (Java IO): Auto-save database ke .ser setiap kelipatan 30 detik
+                        if (secondsCounter % 30 == 0
+                                && !manager.getPatientHistory().isEmpty()) {
+                            manager.saveDatabaseToFile();
+                            SwingUtilities.invokeLater(() -> refreshDisplay());
+                        }
+
+                        final int nextSave = 30 - (secondsCounter % 30);
+
+                        // Update komponen GUI dari background thread lewat Event Dispatch Thread (EDT)
+                        SwingUtilities.invokeLater(() ->
+                                lblClockAndThread.setText(
+                                        "Jam: " + timeStr
+                                                + " | Auto-Save Thread: Aktif ("
+                                                + nextSave + "d)"
+                                ));
+
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    } catch (IOException ioEx) {
+                        System.err.println(
+                                "Auto-save gagal: " + ioEx.getMessage());
+                    }
+                }
+            }
+        };
+
+        Thread autoSaveThread = new Thread(
+             backgroundTask, "Clinic-AutoSave-Thread");
+
+        autoSaveThread.start();
     }
 }
