@@ -78,6 +78,7 @@ public class ClinicFrame extends JFrame {
         setLayout(new BorderLayout(10, 10));
 
         initComponents();
+        setupFocusAndLiveValidation();
         loadInitialData();
     }
 
@@ -247,6 +248,85 @@ public class ClinicFrame extends JFrame {
         southContainer.add(buttonPanel, BorderLayout.NORTH);
         southContainer.add(scrollLog, BorderLayout.CENTER);
         add(southContainer, BorderLayout.SOUTH);
+    }
+
+    // Validasi real-time saat mengetik maupun saat kursor pindah (focusLost)
+    private void setupFocusAndLiveValidation() {
+        // 1. Nama Lengkap: cek huruf kapital pakai method String.toUpperCase() (Bab 9)
+        Runnable validateName = () -> {
+            String val = txtName.getText();
+            if (!val.isEmpty() && !val.equals(val.toUpperCase())) {
+                txtName.setBorder(errorBorder);
+                lblNameWarn.setText("Peringatan: Nama ditulis dengan huruf KAPITAL!");
+            } else {
+                txtName.setBorder(normalBorder);
+                lblNameWarn.setText(" ");
+            }
+        };
+
+        txtName.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) { validateName.run(); }
+        });
+
+        // Bab 7 (Abstraction): Implementasi method abstrak dari interface DocumentListener
+        txtName.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { validateName.run(); }
+            public void removeUpdate(DocumentEvent e) { validateName.run(); }
+            public void changedUpdate(DocumentEvent e) { validateName.run(); }
+        });
+
+        // 2. Umur: cek format angka saja pakai regex String.matches() (Bab 9)
+        Runnable validateAge = () -> {
+            String val = txtAge.getText().trim();
+            if (!val.isEmpty() && !val.matches("\\d+")) {
+                txtAge.setBorder(errorBorder);
+                lblAgeWarn.setText("Peringatan: Umur harus dalam bentuk angka!");
+            } else {
+                txtAge.setBorder(normalBorder);
+                lblAgeWarn.setText(" ");
+            }
+        };
+
+        txtAge.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) { validateAge.run(); }
+        });
+
+        txtAge.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { validateAge.run(); }
+            public void removeUpdate(DocumentEvent e) { validateAge.run(); }
+            public void changedUpdate(DocumentEvent e) { validateAge.run(); }
+        });
+
+        // 3. Nomor BPJS: wajib 13 digit angka kalau checkbox BPJS dicentang
+        Runnable validateBpjs = () -> {
+            if (!chkBpjs.isSelected()) {
+                txtBpjsNo.setBorder(normalBorder);
+                lblBpjsWarn.setText(" ");
+                return;
+            }
+
+            String val = txtBpjsNo.getText().trim();
+            if (!val.matches("\\d{13}")) {
+                txtBpjsNo.setBorder(errorBorder);
+                lblBpjsWarn.setText("Peringatan: Nomor BPJS harus 13 digit angka!");
+            } else {
+                txtBpjsNo.setBorder(normalBorder);
+                lblBpjsWarn.setText(" ");
+            }
+        };
+
+        txtBpjsNo.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) { validateBpjs.run(); }
+        });
+
+        txtBpjsNo.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { validateBpjs.run(); }
+            public void removeUpdate(DocumentEvent e) { validateBpjs.run(); }
+            public void changedUpdate(DocumentEvent e) { validateBpjs.run(); }
+        });
     }
 
     // Bab 12 (Java IO) & Bab 11 (Exceptions): Baca ulang data dari file serialisasi saat aplikasi dibuka
