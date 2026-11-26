@@ -235,6 +235,19 @@ public class ClinicFrame extends JFrame {
         JButton btnReset = new JButton("Reset Data");
         buttonPanel.add(btnReset);
 
+        btnReset.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Hapus seluruh riwayat dan antrean pasien?", "Konfirmasi Reset",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, warningIcon);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                manager.resetDatabase();
+                refreshDisplay();
+                JOptionPane.showMessageDialog(this, "Data berhasil direset menjadi 0!",
+                        "Reset Berhasil", JOptionPane.INFORMATION_MESSAGE, successIcon);
+            }
+        });
+
         buttonPanel.add(lblSearch);
         buttonPanel.add(txtSearch);
         buttonPanel.add(btnSearch);
@@ -254,6 +267,25 @@ public class ClinicFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 handleRegisterPatient();
+            }
+        });
+
+        btnCallNext.addActionListener(e -> handleCallNextPatient());
+        // Bab 10 (Generics & Collections): Menampilkan hasil Collections.sort, max, dan min
+        btnStats.addActionListener(e -> JOptionPane.showMessageDialog(this,
+                manager.getClinicStatistics(), "Statistik Klinik (Collections.sort/max/min)",
+                JOptionPane.INFORMATION_MESSAGE, successIcon));
+
+        btnSave.addActionListener(e -> {
+            // Bab 11 (Exceptions) & Bab 12 (Java IO): Simpan objek ke file serialisasi .ser
+            try {
+                manager.saveDatabaseToFile();
+                refreshDisplay();
+                JOptionPane.showMessageDialog(this, "Database berhasil disimpan ke clinic_data.ser!",
+                        "Penyimpanan Berhasil", JOptionPane.INFORMATION_MESSAGE, successIcon);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Gagal menyimpan file: " + ex.getMessage(),
+                        "I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
             }
         });
     }
@@ -375,6 +407,35 @@ public class ClinicFrame extends JFrame {
                     "Validasi Input Gagal", JOptionPane.WARNING_MESSAGE, warningIcon);
         } finally {
             System.out.println("Proses percobaan registrasi pasien selesai.");
+        }
+    }
+
+    private void handleCallNextPatient() {
+        Patient called = manager.callNextPatient();
+
+        if (called == null) {
+            JOptionPane.showMessageDialog(this, "Antrean saat ini kosong!",
+                    "Info Antrean", JOptionPane.WARNING_MESSAGE, warningIcon);
+            return;
+        }
+
+        // Bab 5 (Encapsulation): Ambil ID pasien lewat getter getId()
+        String fileName = "Struk_" + called.getId() + ".txt";
+
+        // Bab 12 (Java IO): Export struk pembayaran ke file .txt
+        try {
+            manager.exportReceiptToTxt(called, fileName);
+            refreshDisplay();
+
+            // Bab 6 (Polymorphism - Dynamic Binding): generateReceipt() menyesuaikan tipe pasien
+            JOptionPane.showMessageDialog(this,
+                    called.generateReceipt() + "\nStruk telah diekspor ke file: " + fileName,
+                    "Pasien Dipanggil & Struk Dicetak",
+                    JOptionPane.INFORMATION_MESSAGE, successIcon);
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Gagal mencetak struk: " + ex.getMessage(),
+                    "File I/O Error", JOptionPane.ERROR_MESSAGE, warningIcon);
         }
     }
 
