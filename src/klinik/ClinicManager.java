@@ -15,6 +15,7 @@ public class ClinicManager {
 
     private static final String DB_FILE = "clinic_data.ser";
 
+    // menginisialisasi tarif di setiap poli
     public ClinicManager() {
         // Autoboxing dan nilai double otomatis di dalam hashmap
         polyTariffMap.put("Poli Umum", 75000.0);
