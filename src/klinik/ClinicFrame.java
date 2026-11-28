@@ -18,17 +18,17 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
-// Bab 1 & 2 (OOP, Class & Object) + Bab 4 (Inheritance): ClinicFrame mewarisi JFrame
+// OOP, Class & Object, Inheritance: ClinicFrame mewarisi JFrame
 public class ClinicFrame extends JFrame {
 
-    // Bab 5 (Encapsulation): Semua atribut dibikin private biar aksesnya terkontrol di dalam class
-    // Bab 2 (Class & Object): Instansiasi objek ClinicManager & komponen Swing
+    // Encapsulation: Semua atribut dibikin private biar aksesnya terkontrol di dalam class
+    // Class & Object: Instansiasi objek ClinicManager & komponen Swing
     private final ClinicManager manager = new ClinicManager();
 
-    // Bab 13 (Java GUI): Komponen input form & tampilan
+    // Java GUI: Komponen input form & tampilan
     private final JTextField txtName = new JTextField();
     private final JTextField txtAge = new JTextField();
-    // Bab 10 (Generics): Pakai tipe parameter <String> pada JComboBox
+    // Generics: Pakai tipe parameter <String> pada JComboBox
     private final JComboBox<String> cmbPoli = new JComboBox<>(new String[]{
             "Poli Umum", "Poli Gigi", "Poli Anak", "Poli Mata"
     });
@@ -37,12 +37,12 @@ public class ClinicFrame extends JFrame {
     private final JTextField txtBpjsNo = new JTextField();
     private final JTextField txtSearch = new JTextField(10);
 
-    // Label peringatan merah di bawah tiap kolom
+    // Java GUI: Label peringatan merah di bawah tiap kolom
     private final JLabel lblNameWarn = new JLabel(" ");
     private final JLabel lblAgeWarn = new JLabel(" ");
     private final JLabel lblBpjsWarn = new JLabel(" ");
 
-    // Border normal vs border merah terang 
+    // Java GUI: Border normal vs border merah terang
     private final Border normalBorder = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(180, 185, 190), 1),
             BorderFactory.createEmptyBorder(3, 6, 3, 6)
@@ -53,7 +53,7 @@ public class ClinicFrame extends JFrame {
             BorderFactory.createEmptyBorder(2, 5, 2, 5)
     );
 
-    // Bab 13 (Java GUI): Custom ImageIcon untuk pop-up Berhasil (Centang Hijau) & Gagal (Tanda Seru)
+    // Java GUI: Custom ImageIcon untuk pop-up Berhasil (Centang Hijau) & Gagal (Tanda Seru)
     private final ImageIcon successIcon = createSuccessIcon();
     private final ImageIcon warningIcon = createWarningIcon();
 
@@ -62,23 +62,23 @@ public class ClinicFrame extends JFrame {
     private final JTextArea areaLog = new JTextArea(5, 40);
     private final JLabel lblClockAndThread = new JLabel("Memuat jam sistem...");
 
-    // Bab 2 (Class & Object): Constructor untuk inisialisasi awal frame saat objek dibuat
+    // Class & Object (Constructor): Inisialisasi awal frame saat objek dibuat
     public ClinicFrame() {
         setTitle("Sistem Antrean & Administrasi Klinik SehatKita");
         setSize(1140, 760);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Bab 13 (Java GUI): BorderLayout sebagai layout utama frame
+        // Java GUI (Layout Manager): BorderLayout sebagai layout utama frame
         setLayout(new BorderLayout(10, 10));
 
         initComponents();
         setupFocusAndLiveValidation();
         loadInitialData();
-        startBackgroundThread(); // Bab 14: Jalankan Multithreading
+        startBackgroundThread(); // Multithreading: Jalankan background thread
     }
 
-    // Bab 13 (Java GUI): Gambar custom icon centang hijau pakai Graphics2D
+    // Java GUI (Graphics2D): Gambar custom icon centang hijau pakai Graphics2D
     private ImageIcon createSuccessIcon() {
         int size = 44; 
         BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
@@ -96,7 +96,7 @@ public class ClinicFrame extends JFrame {
         return new ImageIcon(img);
     }
 
-    // Bab 13 (Java GUI): Gambar custom icon tanda seru merah pakai Graphics2D
+    // Java GUI (Graphics2D): Gambar custom icon tanda seru merah pakai Graphics2D
     private ImageIcon createWarningIcon() {
         int size = 44;
         BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
@@ -117,7 +117,7 @@ public class ClinicFrame extends JFrame {
     private void initComponents() {
         Color clinicGreen = new Color(16, 124, 65);
 
-        // 1. NORTH PANEL: Header & Live Thread Status
+        // Java GUI (NORTH PANEL): Header & Live Thread Status
         JPanel headerPanel = new JPanel(new BorderLayout(20, 0));
         headerPanel.setBackground(clinicGreen);
         headerPanel.setBorder(new EmptyBorder(12, 16, 12, 16));
@@ -133,7 +133,7 @@ public class ClinicFrame extends JFrame {
         headerPanel.add(lblClockAndThread, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // 2. WEST PANEL: Form pendaftaran pasien pakai GridLayout (Bab 13)
+        // Java GUI (WEST PANEL - GridLayout): Form pendaftaran pasien pakai GridLayout
         JPanel formPanel = new JPanel(new GridLayout(0, 1, 2, 2));
         formPanel.setBorder(new TitledBorder("Form Pendaftaran Pasien Baru"));
         formPanel.setPreferredSize(new Dimension(340, 0));
@@ -180,7 +180,7 @@ public class ClinicFrame extends JFrame {
 
         add(formPanel, BorderLayout.WEST);
 
-        // Toggle aktif/nonaktif kolom BPJS saat checkbox dicentang
+        // Java GUI (Event Handling): Toggle aktif/nonaktif kolom BPJS saat checkbox dicentang
         chkBpjs.addActionListener(e -> {
             boolean selected = chkBpjs.isSelected();
             txtBpjsNo.setEnabled(selected);
@@ -193,7 +193,7 @@ public class ClinicFrame extends JFrame {
             }
         });
 
-        // 3. CENTER PANEL: Split tampilan Antrean (Queue FIFO) & Riwayat (ArrayList)
+        // Java GUI (CENTER PANEL - GridLayout): Split tampilan Antrean (Queue FIFO) & Riwayat (ArrayList)
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 10));
 
         areaQueue.setEditable(false);
@@ -210,16 +210,16 @@ public class ClinicFrame extends JFrame {
         JScrollPane scrollHistory = new JScrollPane(areaHistory);
         scrollHistory.setBorder(new TitledBorder("Riwayat Seluruh Pasien"));
 
-        // Bab 4 (Inheritance) & Bab 6 (Polymorphism - Overriding): MouseAdapter mewarisi MouseListener
+        // Inheritance & Polymorphism (Overriding): MouseAdapter mewarisi MouseListener
         areaHistory.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int offset = areaHistory.viewToModel2D(e.getPoint());
 
-                // Bab 11 (Exceptions): Tangkap BadLocationException kalau klik di area kosong
+                // Exception Handling: Tangkap BadLocationException kalau klik di area kosong
                 try {
                     int line = areaHistory.getLineOfOffset(offset);
-                    // Bab 10 (Generics & Collections): Ambil List<Patient> dari ArrayList riwayat
+                    // Generics & Collections: Ambil List<Patient> dari ArrayList riwayat
                     List<Patient> patients = manager.getPatientHistory();
 
                     if (line >= 0 && line < patients.size()) {
@@ -235,7 +235,7 @@ public class ClinicFrame extends JFrame {
         centerPanel.add(scrollHistory);
         add(centerPanel, BorderLayout.CENTER);
 
-        // 4. SOUTH PANEL: Tombol aksi (FlowLayout) + Log aktivitas thread-safe
+        // Java GUI (SOUTH PANEL - FlowLayout): Tombol aksi (FlowLayout) + Log aktivitas thread-safe
         JPanel southContainer = new JPanel(new BorderLayout(5, 5));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
@@ -272,24 +272,24 @@ public class ClinicFrame extends JFrame {
         areaLog.setEditable(false);
         areaLog.setFont(new Font("Monospaced", Font.PLAIN, 11));
         JScrollPane scrollLog = new JScrollPane(areaLog);
-        // Bab 9 (String): Log di dalam manager memakai StringBuffer yang thread-safe
+        // String (StringBuffer): Log di dalam manager memakai StringBuffer yang thread-safe
         scrollLog.setBorder(new TitledBorder("Log Aktivitas"));
 
         southContainer.add(buttonPanel, BorderLayout.NORTH);
         southContainer.add(scrollLog, BorderLayout.CENTER);
         add(southContainer, BorderLayout.SOUTH);
 
-        // Bab 13 (Event Handling): Listener tombol tambah pasien
+        // Java GUI (Event Handling): Listener tombol tambah pasien
         btnAdd.addActionListener(e -> handleRegisterPatient());
 
         btnCallNext.addActionListener(e -> handleCallNextPatient());
-        // Bab 10 (Generics & Collections): Menampilkan hasil Collections.sort, max, dan min
+        // Generics & Collections: Menampilkan hasil Collections.sort, max, dan min
         btnStats.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 manager.getClinicStatistics(), "Statistik Klinik",
                 JOptionPane.INFORMATION_MESSAGE, successIcon));
 
         btnSave.addActionListener(e -> {
-            // Bab 11 (Exceptions) & Bab 12 (Java IO): Simpan objek ke file serialisasi .ser
+            // Exception Handling & Java I/O (Serialization): Simpan objek ke file serialisasi .ser
             try {
                 manager.saveDatabaseToFile();
                 refreshDisplay();
@@ -304,9 +304,9 @@ public class ClinicFrame extends JFrame {
         btnSearch.addActionListener(e -> handleSearch());
     }
 
-    // Validasi real-time saat mengetik maupun saat kursor pindah (focusLost)
+    // Java GUI (Event Handling): Validasi real-time saat mengetik maupun saat kursor pindah (focusLost)
     private void setupFocusAndLiveValidation() {
-        // 1. Nama Lengkap: cek huruf kapital pakai method String.toUpperCase() (Bab 9)
+        // String: Nama Lengkap cek huruf kapital pakai method String.toUpperCase()
         Runnable validateName = () -> {
             String val = txtName.getText();
             if (!val.isEmpty() && !val.equals(val.toUpperCase())) {
@@ -323,14 +323,14 @@ public class ClinicFrame extends JFrame {
             public void focusLost(FocusEvent e) { validateName.run(); }
         });
 
-        // Bab 7 (Abstraction): Implementasi method abstrak dari interface DocumentListener
+        // Abstraction (Interface): Implementasi method abstrak dari interface DocumentListener
         txtName.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { validateName.run(); }
             public void removeUpdate(DocumentEvent e) { validateName.run(); }
             public void changedUpdate(DocumentEvent e) { validateName.run(); }
         });
 
-        // 2. Umur: cek format angka saja pakai regex String.matches() (Bab 9)
+        // String (Regex): Umur cek format angka saja pakai regex String.matches()
         Runnable validateAge = () -> {
             String val = txtAge.getText().trim();
             if (!val.isEmpty() && !val.matches("\\d+")) {
@@ -353,7 +353,7 @@ public class ClinicFrame extends JFrame {
             public void changedUpdate(DocumentEvent e) { validateAge.run(); }
         });
 
-        // 3. Nomor BPJS: wajib 13 digit angka kalau checkbox BPJS dicentang
+        // String (Regex): Nomor BPJS wajib 13 digit angka kalau checkbox BPJS dicentang
         Runnable validateBpjs = () -> {
             if (!chkBpjs.isSelected()) {
                 txtBpjsNo.setBorder(normalBorder);
@@ -384,7 +384,7 @@ public class ClinicFrame extends JFrame {
     }
 
     private void handleRegisterPatient() {
-        // Bab 11 (Exceptions): Blok try-catch untuk menangani custom exception validasi
+        // Exception Handling: Blok try-catch untuk menangani custom exception validasi
         try {
             String newPatientId = manager.registerPatient(
                     txtName.getText(),
@@ -431,15 +431,15 @@ public class ClinicFrame extends JFrame {
             return;
         }
 
-        // Bab 5 (Encapsulation): Ambil ID pasien lewat getter getId()
+        // Encapsulation: Ambil ID pasien lewat getter getId()
         String fileName = "Struk_" + called.getId() + ".txt";
 
-        // Bab 12 (Java IO): Export struk pembayaran ke file .txt
+        // Java I/O & Exception Handling: Export struk pembayaran ke file .txt
         try {
             manager.exportReceiptToTxt(called, fileName);
             refreshDisplay();
 
-            // Bab 6 (Polymorphism - Dynamic Binding): generateReceipt() menyesuaikan tipe pasien
+            // Polymorphism (Dynamic Binding): generateReceipt() menyesuaikan tipe pasien
             JOptionPane.showMessageDialog(this,
                     called.generateReceipt() + "\nStruk telah diekspor ke file: " + fileName,
                     "Pasien Dipanggil & Struk Dicetak",
@@ -452,12 +452,12 @@ public class ClinicFrame extends JFrame {
     }
 
     private void handleSearch() {
-        // Bab 9 (String): Rapikan input pencarian pakai trim() dan cek prefix startsWith()
+        // String: Rapikan input pencarian pakai trim() dan cek prefix startsWith()
         String query = txtSearch.getText().trim();
 
         if (query.isEmpty()) return;
 
-        // Bab 6 (Polymorphism - Method Overloading): searchPatient(String) untuk cari berdasarkan ID
+        // Polymorphism (Method Overloading): searchPatient(String) untuk cari berdasarkan ID
         Patient byId = manager.searchPatient(
                 query.startsWith("PSN-") ? query : "PSN-" + query);
 
@@ -467,14 +467,14 @@ public class ClinicFrame extends JFrame {
             return;
         }
 
-        // Bab 6 (Polymorphism - Method Overloading): searchPatient(String, int) untuk cari berdasarkan Nama
+        // Polymorphism (Method Overloading): searchPatient(String, int) untuk cari berdasarkan Nama
         List<Patient> byName = manager.searchPatient(query, 0);
 
         if (byName.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Pasien '" + query + "' tidak ditemukan.",
                     "Hasil Pencarian", JOptionPane.WARNING_MESSAGE, warningIcon);
         } else {
-            // Bab 9 (String): Susun hasil pencarian pakai StringBuilder
+            // String (StringBuilder): Susun hasil pencarian pakai StringBuilder
             StringBuilder sb = new StringBuilder("Ditemukan " + byName.size() + " pasien:\n\n");
 
             for (Patient p : byName) {
@@ -486,25 +486,25 @@ public class ClinicFrame extends JFrame {
         }
     }
 
-    // Menampilkan detail pasien saat baris riwayat diklik
+    // Java GUI & Polymorphism: Menampilkan detail pasien saat baris riwayat diklik
     private void showPatientDetail(Patient patient) {
         String jenisPasien;
         String nomorBpjs = "-";
 
-        // Bab 4 (Inheritance) & Bab 6 (Polymorphism): Cek subclass BPJSPatient & downcasting
+        // Inheritance & Polymorphism: Cek subclass BPJSPatient & downcasting
         if (patient instanceof BPJSPatient) {
             BPJSPatient bpjsPatient = (BPJSPatient) patient;
             jenisPasien = "BPJS";
 
-            // Bab 5 (Encapsulation) & Bab 9 (String): Ambil no BPJS via getter lalu masking 9 digit awal
+            // Encapsulation & String: Ambil no BPJS via getter lalu masking 9 digit awal
             String number = bpjsPatient.getBpjsNumber();
             nomorBpjs = "*********" + number.substring(9);
         } else {
             jenisPasien = "Reguler";
         }
 
-        // Bab 5 (Encapsulation): Akses seluruh data atribut lewat method getter
-        // Bab 6 (Polymorphism - Dynamic Binding): calculateTotalBill() hitung tagihan sesuai jenis pasien
+        // Encapsulation: Akses seluruh data atribut lewat method getter
+        // Polymorphism (Dynamic Binding): calculateTotalBill() hitung tagihan sesuai jenis pasien
         String detail =
                 "ID Pasien       : " + patient.getId() + "\n" +
                 "Nama            : " + patient.getName() + "\n" +
@@ -522,7 +522,7 @@ public class ClinicFrame extends JFrame {
                 successIcon);
     }
 
-    // Bab 12 (Java IO) & Bab 11 (Exceptions): Baca ulang data dari file serialisasi saat aplikasi dibuka
+    // Java I/O (Deserialization) & Exception Handling: Baca ulang data dari file serialisasi saat aplikasi dibuka
     private void loadInitialData() {
         try {
             manager.loadDatabaseFromFile();
@@ -534,11 +534,11 @@ public class ClinicFrame extends JFrame {
     }
 
     private void refreshDisplay() {
-        // Bab 9 (String): Pakai StringBuilder supaya penyusunan daftar antrean lebih efisien
+        // String (StringBuilder): Pakai StringBuilder supaya penyusunan daftar antrean lebih efisien
         StringBuilder qText = new StringBuilder();
         int pos = 1;
 
-        // Bab 10 (Generics & Collections): Iterasi elemen dari Queue antrean
+        // Generics & Collections: Iterasi elemen dari Queue antrean
         for (Patient p : manager.getWaitingQueue()) {
             qText.append(pos++).append(". ").append(p.toString()).append("\n");
         }
@@ -550,7 +550,7 @@ public class ClinicFrame extends JFrame {
 
         StringBuilder hText = new StringBuilder();
 
-        // Bab 10 (Generics & Collections): Iterasi elemen dari ArrayList riwayat
+        // Generics & Collections: Iterasi elemen dari ArrayList riwayat
         for (Patient p : manager.getPatientHistory()) {
             hText.append("• ").append(p.toString()).append("\n");
         }
@@ -563,9 +563,9 @@ public class ClinicFrame extends JFrame {
         areaLog.setText(manager.getActivityLog());
     }
 
-    // Bab 14 (Multithreading): Background thread untuk jam real-time & auto-save tiap 30 detik
+    // Multithreading: Background thread untuk jam real-time & auto-save tiap 30 detik
     private void startBackgroundThread() {
-        // Bab 7 (Abstraction): Anonymous class mengimplementasikan interface Runnable
+        // Abstraction (Interface) & Multithreading: Anonymous class mengimplementasikan interface Runnable
         Runnable backgroundTask = new Runnable() {
             private int secondsCounter = 0;
             private final SimpleDateFormat sdf =
@@ -575,12 +575,12 @@ public class ClinicFrame extends JFrame {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(1000); // Jeda thread 1 detik
+                        Thread.sleep(1000); // Multithreading: Jeda thread 1 detik
                         secondsCounter++;
 
                         String timeStr = sdf.format(new Date());
 
-                        // Bab 12 (Java IO): Auto-save database ke .ser setiap kelipatan 30 detik
+                        // Java I/O (Serialization): Auto-save database ke .ser setiap kelipatan 30 detik
                         if (secondsCounter % 30 == 0
                                 && !manager.getPatientHistory().isEmpty()) {
                             manager.saveDatabaseToFile();
@@ -589,7 +589,7 @@ public class ClinicFrame extends JFrame {
 
                         final int nextSave = 30 - (secondsCounter % 30);
 
-                        // Update komponen GUI dari background thread lewat Event Dispatch Thread (EDT)
+                        // Multithreading & Java GUI: Update komponen GUI dari background thread lewat Event Dispatch Thread (EDT)
                         SwingUtilities.invokeLater(() ->
                                 lblClockAndThread.setText(
                                         "Jam: " + timeStr
