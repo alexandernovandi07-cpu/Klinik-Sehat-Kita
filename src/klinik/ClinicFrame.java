@@ -205,7 +205,7 @@ public class ClinicFrame extends JFrame {
         areaQueue.setFont(new Font("Monospaced", Font.PLAIN, 12));
         areaQueue.setBackground(new Color(244, 251, 247));
         JScrollPane scrollQueue = new JScrollPane(areaQueue);
-        scrollQueue.setBorder(new TitledBorder("Antrean Tunggu Saat Ini (Queue - FIFO)"));
+        scrollQueue.setBorder(new TitledBorder("Antrean Tunggu Saat Ini"));
 
         areaHistory.setEditable(false);
         areaHistory.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -213,7 +213,7 @@ public class ClinicFrame extends JFrame {
         areaHistory.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JScrollPane scrollHistory = new JScrollPane(areaHistory);
-        scrollHistory.setBorder(new TitledBorder("Riwayat Seluruh Pasien (ArrayList)"));
+        scrollHistory.setBorder(new TitledBorder("Riwayat Seluruh Pasien"));
 
         // Bab 4 (Inheritance) & Bab 6 (Polymorphism - Overriding): MouseAdapter mewarisi MouseListener
         areaHistory.addMouseListener(new MouseAdapter() {
@@ -278,7 +278,7 @@ public class ClinicFrame extends JFrame {
         areaLog.setFont(new Font("Monospaced", Font.PLAIN, 11));
         JScrollPane scrollLog = new JScrollPane(areaLog);
         // Bab 9 (String): Log di dalam manager memakai StringBuffer yang thread-safe
-        scrollLog.setBorder(new TitledBorder("Log Aktivitas Thread-Safe (StringBuffer)"));
+        scrollLog.setBorder(new TitledBorder("Log Aktivitas"));
 
         southContainer.add(buttonPanel, BorderLayout.NORTH);
         southContainer.add(scrollLog, BorderLayout.CENTER);
