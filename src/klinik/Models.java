@@ -21,7 +21,7 @@ interface Billable {
     }
 }
 
-// WEEK 7 & WEEK 5: Abstract Class + Encapsulation
+// Abstract class Person dengan penerapan encapsulation
 abstract class Person implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -35,9 +35,10 @@ abstract class Person implements Serializable {
         setAge(age);
     }
 
+    // Method untuk menentukan kategori pasien
     public abstract String getPatientCategory();
 
-    // Getter dan Setter ID
+    // Getter dan Setter untuk ID pasien
     public String getId() {
         return id;
     }
@@ -51,7 +52,7 @@ abstract class Person implements Serializable {
         this.id = id.trim();
     }
 
-    // Getter dan Setter Nama
+    // Getter dan Setter untuk nama pasien
     public String getName() {
         return name;
     }
@@ -65,7 +66,7 @@ abstract class Person implements Serializable {
         this.name = name.trim();
     }
 
-    // Getter dan Setter Umur
+    // Getter dan Setter untuk umur pasien
     public int getAge() {
         return age;
     }
