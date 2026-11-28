@@ -64,9 +64,6 @@ public class ClinicFrame extends JFrame {
     private final JTextArea areaLog = new JTextArea(5, 40);
     private final JLabel lblClockAndThread = new JLabel("Memuat jam sistem...");
 
-    // Bab 3 (Java Variables): Variabel primitif boolean dengan modifier volatile agar aman dibaca antar-thread
-    private volatile boolean runningThread = true;
-
     // Bab 2 (Class & Object): Constructor untuk inisialisasi awal frame saat objek dibuat
     public ClinicFrame() {
         setTitle("Sistem Antrean & Administrasi Klinik SehatKita");
@@ -295,7 +292,7 @@ public class ClinicFrame extends JFrame {
         btnCallNext.addActionListener(e -> handleCallNextPatient());
         // Bab 10 (Generics & Collections): Menampilkan hasil Collections.sort, max, dan min
         btnStats.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                manager.getClinicStatistics(), "Statistik Klinik (Collections.sort/max/min)",
+                manager.getClinicStatistics(), "Statistik Klinik",
                 JOptionPane.INFORMATION_MESSAGE, successIcon));
 
         btnSave.addActionListener(e -> {
@@ -394,7 +391,7 @@ public class ClinicFrame extends JFrame {
     }
 
     private void handleRegisterPatient() {
-        // Bab 11 (Exceptions): Blok try-catch-finally untuk menangani custom exception validasi
+        // Bab 11 (Exceptions): Blok try-catch untuk menangani custom exception validasi
         try {
             String newPatientId = manager.registerPatient(
                     txtName.getText(),
@@ -429,8 +426,6 @@ public class ClinicFrame extends JFrame {
         } catch (InvalidPatientDataException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Validasi Input Gagal", JOptionPane.WARNING_MESSAGE, warningIcon);
-        } finally {
-            System.out.println("Proses percobaan registrasi pasien selesai.");
         }
     }
 
@@ -585,7 +580,7 @@ public class ClinicFrame extends JFrame {
 
             @Override
             public void run() {
-                while (runningThread) {
+                while (true) {
                     try {
                         Thread.sleep(1000); // Jeda thread 1 detik
                         secondsCounter++;
@@ -605,7 +600,7 @@ public class ClinicFrame extends JFrame {
                         SwingUtilities.invokeLater(() ->
                                 lblClockAndThread.setText(
                                         "Jam: " + timeStr
-                                                + " | Auto-Save Thread: Aktif ("
+                                                + " | Auto-Save: Aktif ("
                                                 + nextSave + "d)"
                                 ));
 
