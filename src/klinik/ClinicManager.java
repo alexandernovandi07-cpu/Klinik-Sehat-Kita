@@ -38,7 +38,7 @@ public class ClinicManager {
         return polyTariffMap;
     }
 
-    // Custom checked exception dan synchronized
+    // mendaftarkan pasien baru menggunakan synchronized dan cutom checked jika validasi gagal
     public synchronized String registerPatient(String rawName, String rawAge,
                                                String poliName, String complaint,
                                                boolean isBpjs, String bpjsNo) throws InvalidPatientDataException {
@@ -46,6 +46,7 @@ public class ClinicManager {
         String ageInput = rawAge.trim();
         String cleanComplaint = complaint.trim();
 
+        // validasi input karena tidak boleh kosong
         if (name.isEmpty() || ageInput.isEmpty() || cleanComplaint.isEmpty()) {
             throw new InvalidPatientDataException("Nama, Umur, dan Keluhan tidak boleh kosong!");
         }
@@ -73,8 +74,10 @@ public class ClinicManager {
             throw new InvalidPatientDataException("Umur harus berada di antara 1 hingga 130 tahun!");
         }
 
+        // membuat ID pasien baru secara otomatis
         String id = generatePatientId();
 
+        // mengambil tarif poli sesuai dengan nama poli dan ada tarif default
         double baseFee = polyTariffMap.getOrDefault(poliName, 75000.0);
         String fullComplaint = poliName + " - " + cleanComplaint;
 
