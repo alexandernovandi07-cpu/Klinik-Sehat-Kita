@@ -16,8 +16,14 @@ Dibuat untuk memenuhi **Final Project Mata Kuliah Pemrograman Berorientasi Objek
 * **String & Collections (Week 9–10):** `StringBuilder` (cetak struk), `StringBuffer` (log thread-safe), `ArrayList`, `HashSet`, `Queue` (`LinkedList`), `HashMap`, serta `Collections.sort/min/max`.
 * **Exception, Java I/O & Multithreading (Week 11–14):** Custom `InvalidPatientDataException`, `assert`, `ObjectOutputStream` (`.ser`), `BufferedWriter` (`.txt`), serta background `Runnable` thread untuk jam real-time dan *synchronized auto-save*.
 
+
 ## Cara Menjalankan Aplikasi
-Pastikan **JDK** sudah terpasang, lalu jalankan perintah berikut dari root folder repository:
+
+Pastikan **JDK** sudah terpasang, lalu pilih salah satu cara berikut untuk menjalankan aplikasi.
+
+### Opsi 1. Melalui Terminal
+
+Jalankan perintah berikut dari root folder repository:
 
 ```bash
 # 1. Compile source code
@@ -26,3 +32,14 @@ javac -d out src/klinik/*.java
 
 # 2. Jalankan aplikasi (dengan assertion aktif)
 java -ea -cp out klinik.MainApp
+```
+
+### Opsi 2. Melalui File Launcher
+
+Aplikasi juga dapat dijalankan secara langsung melalui file launcher yang tersedia di folder utama repository:
+
+- **Windows:** `Aplikasi_KlinikSehat.bat`
+- **Linux:** `Aplikasi_KlinikSehat.sh`
+- **macOS:** `Apilkasi_KlinikSehat.command`
+  
+Pastikan JDK sudah terpasang sebelum menjalankan file launcher.
