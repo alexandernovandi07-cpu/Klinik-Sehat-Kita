@@ -81,13 +81,14 @@ abstract class Person implements Serializable {
     }
 }
 
-// WEEK 4: Inheritance & Comparable
+// Class Patient yang mewarisi Person dan menerapkan Billable serta Comparable
 abstract class Patient extends Person implements Billable, Comparable<Patient> {
     private static final long serialVersionUID = 1L;
 
+    // Menghitung jumlah seluruh pasien yang dibuat
     private static int totalPatientsCreated = 0;
 
-    // Encapsulation
+    // Atribut pasien dibuat private untuk menerapkan encapsulation
     private String complaint;
     private double baseConsultationFee;
 
@@ -101,11 +102,12 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
         totalPatientsCreated++;
     }
 
+    // Mengambil jumlah pasien yang sudah dibuat
     public static int getTotalPatientsCreated() {
         return totalPatientsCreated;
     }
 
-    // Getter dan Setter Keluhan
+    // Getter dan Setter untuk keluhan pasien
     public String getComplaint() {
         return complaint;
     }
@@ -119,7 +121,7 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
         this.complaint = complaint.trim();
     }
 
-    // Getter dan Setter Tarif Konsultasi
+    // Getter dan Setter untuk tarif konsultasi
     public double getBaseConsultationFee() {
         return baseConsultationFee;
     }
@@ -133,7 +135,7 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
         this.baseConsultationFee = fee;
     }
 
-    // WEEK 9: StringBuilder
+    // Membuat struk pembayaran menggunakan StringBuilder
     public String generateReceipt() {
         StringBuilder sb = new StringBuilder();
 
@@ -154,7 +156,7 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
         return sb.toString();
     }
 
-    // WEEK 10: Comparable
+    // Membandingkan total tagihan antar pasien
     @Override
     public int compareTo(Patient other) {
         return Double.compare(
@@ -163,6 +165,7 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
         );
     }
 
+    // Menampilkan informasi pasien dalam bentuk String
     @Override
     public String toString() {
         return String.format(
@@ -177,7 +180,7 @@ abstract class Patient extends Person implements Billable, Comparable<Patient> {
     }
 }
 
-// WEEK 4 & WEEK 6: Inheritance and Polymorphism
+// Class untuk pasien reguler yang mewarisi Patient
 class RegulerPatient extends Patient {
     private static final long serialVersionUID = 1L;
 
@@ -186,18 +189,20 @@ class RegulerPatient extends Patient {
         super(id, name, age, complaint, baseFee);
     }
 
+    // Menentukan kategori pasien reguler
     @Override
     public String getPatientCategory() {
         return "Pasien Reguler (Umum)";
     }
 
+    // Menghitung tagihan pasien reguler ditambah biaya administrasi
     @Override
     public double calculateTotalBill() {
         return getBaseConsultationFee() + ADMIN_FEE;
     }
 }
 
-// WEEK 4 & WEEK 6: Hierarchical Inheritance
+// Class untuk pasien BPJS yang mewarisi Patient
 class BPJSPatient extends Patient {
     private static final long serialVersionUID = 1L;
 
@@ -210,10 +215,12 @@ class BPJSPatient extends Patient {
         setBpjsNumber(bpjsNumber);
     }
 
+    // Getter untuk nomor BPJS
     public String getBpjsNumber() {
         return bpjsNumber;
     }
 
+    // Setter untuk nomor BPJS sekaligus memeriksa formatnya
     public void setBpjsNumber(String bpjsNumber) {
         if (bpjsNumber == null ||
             !bpjsNumber.matches("\\d{13}")) {
@@ -225,13 +232,15 @@ class BPJSPatient extends Patient {
         this.bpjsNumber = bpjsNumber;
     }
 
+    // Menampilkan kategori pasien beserta nomor BPJS
     @Override
     public String getPatientCategory() {
         return "Pasien BPJS (No: " + bpjsNumber + ")";
     }
 
+    // Menghitung tagihan pasien BPJS sebesar 20% dari tarif konsultasi
     @Override
     public double calculateTotalBill() {
         return getBaseConsultationFee() * 0.20;
     }
-}
+} 
