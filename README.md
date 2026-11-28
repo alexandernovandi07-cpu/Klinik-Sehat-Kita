@@ -21,7 +21,7 @@ Dibuat untuk memenuhi **Final Project Mata Kuliah Pemrograman Berorientasi Objek
 
 Pastikan **JDK** sudah terpasang, lalu pilih salah satu cara berikut untuk menjalankan aplikasi.
 
-### Opsi 1. Melalui Terminal
+### 1. Melalui Terminal
 
 Jalankan perintah berikut dari root folder repository:
 
@@ -34,7 +34,7 @@ javac -d out src/klinik/*.java
 java -ea -cp out klinik.MainApp
 ```
 
-### Opsi 2. Melalui File Launcher
+### 2. Melalui File Launcher
 
 Aplikasi juga dapat dijalankan secara langsung melalui file launcher yang tersedia di folder utama repository:
 
