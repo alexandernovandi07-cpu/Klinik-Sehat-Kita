@@ -13,9 +13,10 @@ public class ClinicManager {
     // StringBuffer untuk log aktivitas
     private final StringBuffer activityLog = new StringBuffer();
 
+    // Nama file biner untuk proses serialisasi dan desrialisasi data klinik
     private static final String DB_FILE = "clinic_data.ser";
 
-    // menginisialisasi tarif di setiap poli
+    // construktor untuk menginisialisasi tarif di setiap poli
     public ClinicManager() {
         // Autoboxing dan nilai double otomatis di dalam hashmap
         polyTariffMap.put("Poli Umum", 75000.0);
@@ -30,10 +31,12 @@ public class ClinicManager {
         activityLog.append("• ").append(entry).append("\n");
     }
 
+    // mengembalikan seluruh isi log aktivitas ke bentuk string
     public String getActivityLog() {
         return activityLog.toString();
     }
 
+    // mengembalikan map tarif poli yang tersedia
     public Map<String, Double> getPolyTariffMap() {
         return polyTariffMap;
     }
@@ -42,6 +45,7 @@ public class ClinicManager {
     public synchronized String registerPatient(String rawName, String rawAge,
                                                String poliName, String complaint,
                                                boolean isBpjs, String bpjsNo) throws InvalidPatientDataException {
+        // menghapus spasi berlebih di awal dan akhir input
         String name = rawName.trim();
         String ageInput = rawAge.trim();
         String cleanComplaint = complaint.trim();
@@ -63,13 +67,14 @@ public class ClinicManager {
 
         int age;
         try {
-            // ubat string ke integer, lalu unboxing ke int biasa
+            // ubah string ke integer, lalu unboxing ke int biasa
             Integer boxedAge = Integer.valueOf(ageInput);
             age = boxedAge;
         } catch (NumberFormatException e) {
             throw new InvalidPatientDataException("Umur harus dalam bentuk angka yang valid!");
         }
 
+        // validasi rentang umur yang masuk akal
         if (age <= 0 || age > 130) {
             throw new InvalidPatientDataException("Umur harus berada di antara 1 hingga 130 tahun!");
         }
@@ -84,6 +89,7 @@ public class ClinicManager {
         // Upcasting 
         Patient newPatient;
         if (isBpjs) {
+            // nomor BPJS wajib 13 digit
             if (bpjsNo == null || !bpjsNo.trim().matches("\\d{13}")) {
                 throw new InvalidPatientDataException("Nomor BPJS harus terdiri dari 13 digit angka!");
             }
@@ -92,6 +98,7 @@ public class ClinicManager {
             newPatient = new RegulerPatient(id, name, age, fullComplaint, baseFee);
         }
 
+        // menyimpan pasien ke daftar ID unik, riwayat pasien, dan antrean
         registeredIds.add(id);
         patientHistory.add(newPatient);
         waitingQueue.add(newPatient);
@@ -107,6 +114,7 @@ public class ClinicManager {
     private String generatePatientId() {
         int maxNumber = 0;
 
+        // mencari nomor urut tertinggi dari riwayat pasien
         for (Patient patient : patientHistory) {
             String existingId = patient.getId();
 
@@ -123,6 +131,7 @@ public class ClinicManager {
         int nextNumber = maxNumber + 1;
         String candidate = String.format("PSN-%03d", nextNumber);
 
+        // memastikan ID kandidat belum dipakai di registeredIds
         while (registeredIds.contains(candidate)) {
             nextNumber++;
             candidate = String.format("PSN-%03d", nextNumber);
@@ -163,16 +172,18 @@ public class ClinicManager {
         return results;
     }
 
-    // Collections Utility Methods (sort, max, min)
+    // Collections Utility Methods (sort, max, min) untuk menghitung ringkasan statistik klinik
     public synchronized String getClinicStatistics() {
         if (patientHistory.isEmpty()) {
             return "Belum ada data pasien untuk dianalisis.";
         }
+        // membuat salinan list agar urutan asli patientHistory tidak berubah saat diurutkan
         List<Patient> sortedCopy = new ArrayList<>(patientHistory);
         Collections.sort(sortedCopy);
         Patient minBillPatient = Collections.min(sortedCopy);
         Patient maxBillPatient = Collections.max(sortedCopy);
 
+        // menjumlahkan total tagihan  seluruh pasien
         double totalRevenue = 0;
         for (Patient p : patientHistory) {
             totalRevenue += p.calculateTotalBill();
@@ -190,7 +201,7 @@ public class ClinicManager {
         );
     }
 
-    // Serialization (ObjectOutputStream) with synchronized 
+    // Serialization untuk menyimpan riwayat pasien dan antrian pasien ke file biner dengan ObjectOutputStream
     public synchronized void saveDatabaseToFile() throws IOException {
         File file = new File(DB_FILE);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
@@ -200,7 +211,7 @@ public class ClinicManager {
         logActivity("Auto-Save / Penyimpanan database berhasil (" + file.length() + " bytes).");
     }
 
-    // Deserialization (ObjectInputStream) & pengecekan file
+    // Memuat kembali riwayat pasien dan antrean dari file biner menggunakan ObjectInputStream
     @SuppressWarnings("unchecked")
     public synchronized void loadDatabaseFromFile() throws IOException, ClassNotFoundException {
         File file = new File(DB_FILE);
@@ -208,6 +219,7 @@ public class ClinicManager {
             return;
         }
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            // Membaca dan memulihkan daftar riwayat pasien serta set ID terdaftar
             List<Patient> loaded = (List<Patient>) ois.readObject();
             patientHistory.clear();
             registeredIds.clear();
@@ -215,6 +227,7 @@ public class ClinicManager {
                 patientHistory.add(p);
                 registeredIds.add(p.getId());
             }
+            // Membaca data antrean
             waitingQueue.clear();
             try {
                 List<Patient> savedQueue = (List<Patient>) ois.readObject();
@@ -225,7 +238,7 @@ public class ClinicManager {
         }
     }
 
-    // Character Stream (BufferedWriter)
+    // Mengekspor struk pasien ke file teks (.txt) menggunakan BufferedWriter (Character Stream)
     public void exportReceiptToTxt(Patient patient, String fileName) throws IOException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
             bw.write(patient.generateReceipt());
