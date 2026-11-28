@@ -1,8 +1,6 @@
 package klinik;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -82,7 +80,7 @@ public class ClinicFrame extends JFrame {
 
     // Bab 13 (Java GUI): Gambar custom icon centang hijau pakai Graphics2D
     private ImageIcon createSuccessIcon() {
-        int size = 44; // Bab 3 (Java Variables): Variabel lokal primitif int
+        int size = 44; 
         BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -281,13 +279,8 @@ public class ClinicFrame extends JFrame {
         southContainer.add(scrollLog, BorderLayout.CENTER);
         add(southContainer, BorderLayout.SOUTH);
 
-        // Bab 7 (Abstraction) & Bab 13 (Event Handling): Implementasi interface ActionListener
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleRegisterPatient();
-            }
-        });
+        // Bab 13 (Event Handling): Listener tombol tambah pasien
+        btnAdd.addActionListener(e -> handleRegisterPatient());
 
         btnCallNext.addActionListener(e -> handleCallNextPatient());
         // Bab 10 (Generics & Collections): Menampilkan hasil Collections.sort, max, dan min
