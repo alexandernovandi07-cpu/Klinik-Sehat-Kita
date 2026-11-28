@@ -2,19 +2,20 @@ package klinik;
 
 import java.io.Serializable;
 
-// WEEK 11: Custom Checked Exception
+// Exception khusus untuk menangani data pasien yang tidak valid
 class InvalidPatientDataException extends Exception {
     public InvalidPatientDataException(String message) {
         super(message);
     }
 }
 
-// WEEK 7: Interface
+// Interface untuk mengatur perhitungan tagihan pasien
 interface Billable {
     double ADMIN_FEE = 15000.0;
 
     double calculateTotalBill();
 
+    // Mengubah angka menjadi format mata uang Rupiah
     default String getCurrencyFormat(double amount) {
         return String.format("Rp %,.0f", amount);
     }
