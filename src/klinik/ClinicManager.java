@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class ClinicManager {
-    // Interface
+    // Interface untuk menyimpan data utama klinik
     private final List<Patient> patientHistory = new ArrayList<>();         // Riwayat pasien
     private final Set<String> registeredIds = new HashSet<>();              // ID unik tanpa ada yang sama
     private final Queue<Patient> waitingQueue = new LinkedList<>();         // Antrean FIFO
